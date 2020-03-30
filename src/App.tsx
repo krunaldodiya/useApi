@@ -13,10 +13,18 @@ function App() {
     payload: attr("reference", { type: "one", ref: "posts" })
   });
 
-  const { fetchData: fetchDemoPosts } = useRequest({
-    url: "https://learning.shendre.com/api/test",
+  const { fetchData: fetchTestUsers } = useRequest({
+    url: "https://learning.shendre.com/api/test/users",
     payload: attr("custom", {
       users: attr("reference", { type: "many", ref: "users" })
+    })
+  });
+
+  const { fetchData: fetchTestAuth } = useRequest({
+    url: "https://learning.shendre.com/api/test/auth",
+    payload: attr("custom", {
+      token: attr("string"),
+      user: attr("reference", { type: "one", ref: "users" })
     })
   });
 
@@ -26,7 +34,9 @@ function App() {
 
       <button onClick={fetchPostById}>fetch post by id</button>
 
-      <button onClick={fetchDemoPosts}>fetch demo post</button>
+      <button onClick={fetchTestUsers}>fetch test users</button>
+
+      <button onClick={fetchTestAuth}>fetch test auth</button>
 
       <div>
         <div

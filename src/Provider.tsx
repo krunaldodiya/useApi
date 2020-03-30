@@ -67,7 +67,12 @@ export const AppProvider = ({
         const payload = meta[item];
 
         if (payload["attr"] === "reference") {
-          return { ...carry, [item]: generateRefObject(payload["meta"], data) };
+          const object = generateRefObject(
+            payload["meta"],
+            data[payload["meta"]["ref"]]
+          );
+
+          return { ...carry, [item]: object };
         }
 
         return { ...carry, [item]: payload };
