@@ -33,15 +33,18 @@ export function useRequest({
   const metaQuery = JSON.stringify({ url, method, variables });
 
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   async function fetchData() {
-    setLoading(true);
-
-    const response = await axios(meta);
-
-    appContext.writeRequest(metaQuery, response.data, method, payload);
-
-    setLoading(false);
+    try {
+      setLoading(true);
+      const response = await axios(meta);
+      appContext.writeRequest(metaQuery, response.data, method, payload);
+      setLoading(false);
+    } catch (error) {
+      setErrors(error);
+      setLoading(false);
+    }
   }
 
   const requestData = appContext.root[method === "GET" ? "query" : "mutation"];
@@ -49,6 +52,7 @@ export function useRequest({
   return {
     fetchData,
     loading,
+    errors,
     results:
       requestData && requestData.hasOwnProperty(metaQuery)
         ? requestData[metaQuery]

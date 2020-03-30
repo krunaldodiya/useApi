@@ -9,7 +9,17 @@ export const models: ModelType = {
 
   posts: {
     id: attr("string"),
-    name: attr("string"),
-    owner: attr("reference", { type: "one", ref: "users" })
+    title: attr("string"),
+    body: attr("string"),
+    user_id: attr("string"),
+    owner: attr("reference", { type: "one", ref: "users" }),
+    comments: attr("reference", { type: "many", ref: "comments" })
+  },
+
+  comments: {
+    id: attr("string"),
+    comment: attr("string"),
+    post_id: attr("string"),
+    post: attr("reference", { type: "one", ref: "posts" })
   }
 };
