@@ -37,7 +37,9 @@ export const AppProvider = ({
     );
   };
 
-  const generateRefObject = (ref: any, data: any, meta: any) => {
+  const generateRefObject = (meta: any, data: any) => {
+    const ref = meta["ref"];
+
     if (meta["type"] === "one") {
       return generateObject(ref, data);
     }
@@ -51,29 +53,29 @@ export const AppProvider = ({
     return data;
   };
 
+  // payload > attr, meta > ref
+
   const getRequestData = (data: any, { attr, meta }: any) => {
     if (attr === "reference") {
-      const ref = meta["ref"];
-      return generateRefObject(ref, data, meta);
+      return generateRefObject(meta, data);
     }
 
     if (attr === "custom") {
-      // const ref = meta["ref"];
-      // const obj = models[ref];
-
       const keys = Object.keys(meta);
 
       const tk = keys.reduce((carry, item) => {
-        const metaItem = meta[item];
+        const payload = meta[item];
 
-        if (metaItem["attr"] !== "reference") return metaItem;
+        if (payload["attr"] === "reference") {
+          return { ...carry, [item]: generateRefObject(payload["meta"], data) };
+        }
 
-        return { ...carry, [item]: metaItem };
+        return { ...carry, [item]: payload };
       }, {});
 
       console.log(tk, "hello");
 
-      return data;
+      return tk;
     }
 
     return data;
