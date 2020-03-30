@@ -23,12 +23,38 @@ export const AppProvider = ({
 }) => {
   const [root, setRoot] = useState(initialData);
 
-  const getRequestData = (data: any, { type, payload }: any) => {
-    if (type === "reference") {
+  function counter(models: ModelType, meta: any, result: any) {
+    const obj = models[meta["ref"]];
+    const keys = Object.keys(obj);
+
+    return keys.reduce((carry, item) => {
+      if (!result.hasOwnProperty(item)) return carry;
+      return { ...carry, [item]: result[item], ref: meta["ref"] };
+    }, {});
+  }
+
+  const getRequestData = (rootData: any, data: any, { attr, meta }: any) => {
+    if (attr === "reference") {
+      if (meta["type"] === "one") {
+        const one = counter(models, meta, data);
+        console.log(one);
+
+        return one;
+      }
+
+      if (meta["type"] === "many") {
+        const many = data.map((result: any) => {
+          return counter(models, meta, result);
+        });
+
+        console.log(many);
+        return many;
+      }
+
       return data;
     }
 
-    if (type === "custom") {
+    if (attr === "custom") {
       return data;
     }
 
@@ -39,19 +65,19 @@ export const AppProvider = ({
     metaQuery: string,
     data: object,
     method: string,
-    action: any
+    payload: any
   ) => {
     const rootData = { ...root };
 
     const queryable = method === "GET" ? "query" : "mutation";
     rootData[queryable] = {
       ...rootData[queryable],
-      [metaQuery]: getRequestData(data, action)
+      [metaQuery]: getRequestData(rootData, data, payload)
     };
 
     setRoot(rootData);
 
-    writeData(rootData, data, action);
+    writeData(rootData, data, payload);
   };
 
   // const process = (data: any) => {
@@ -68,9 +94,6 @@ export const AppProvider = ({
   // };
 
   const writeData = (rootData: any, data: any, payload: any) => {
-    console.log(models);
-    console.log(payload);
-
     // if (data instanceof Array) {
     //   data.forEach((data: any) => {
     //     process(data);
