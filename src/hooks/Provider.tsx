@@ -1,6 +1,6 @@
+import deepmerge from "deepmerge";
 import React, { createContext, useState } from "react";
 import { ModelType } from "./payload";
-import deepmerge from "deepmerge";
 
 const persistedInitialData = localStorage.getItem("root");
 const initialContext = {
@@ -84,7 +84,7 @@ export const AppProvider = ({
     if (attr === "object") {
       const keys = Object.keys(meta);
 
-      const tk = keys.reduce((carry, item) => {
+      return keys.reduce((carry, item) => {
         const payload = meta[item];
 
         if (payload["attr"] === "reference") {
@@ -99,8 +99,6 @@ export const AppProvider = ({
 
         return { ...carry, [item]: data[item] };
       }, {});
-
-      return tk;
     }
 
     return data;

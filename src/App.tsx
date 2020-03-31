@@ -20,8 +20,6 @@ function App() {
 
   const postmainref = ref(postmain, appContext);
 
-  console.log(postmainref);
-
   return (
     <div>
       <button onClick={fetchPosts}>fetch posts</button>

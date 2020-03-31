@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { PayloadType } from "./payload";
+import { looper } from "./looper";
 
 type methodType = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -40,10 +41,6 @@ export function useRequest({
   const [errors, setErrors] = useState({});
 
   async function fetchData() {
-    if (requestExist) {
-      return;
-    }
-
     try {
       setLoading(true);
       const response = await axios(meta);
@@ -61,6 +58,6 @@ export function useRequest({
     fetchData,
     loading,
     errors,
-    results
+    results: looper(results, appContext)
   };
 }
