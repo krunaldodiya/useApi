@@ -5,12 +5,12 @@ import { attr } from "./payload";
 function App() {
   const { fetchData: fetchPosts, results: posts } = useRequest({
     url: "https://jsonplaceholder.typicode.com/posts",
-    payload: attr("reference", { type: "many", ref: "posts" })
+    payload: attr("array", attr("reference", { type: "many", ref: "posts" }))
   });
 
   const { fetchData: fetchPostById, results: post } = useRequest({
     url: "https://jsonplaceholder.typicode.com/posts/1",
-    payload: attr("reference", { type: "one", ref: "posts" })
+    payload: attr("object", attr("reference", { type: "one", ref: "posts" }))
   });
 
   const { fetchData: fetchTestUsers } = useRequest({

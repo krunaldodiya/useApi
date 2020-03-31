@@ -102,15 +102,11 @@ export const AppProvider = ({
   };
 
   const mapData: any = (data: any) => {
-    console.log(data, "data");
-
     const process: any = (item: any) => {
       return item;
     };
 
     if (data instanceof Array) {
-      console.log("array");
-
       return data.map(item => process(item));
     } else {
       return process(data);
@@ -125,27 +121,27 @@ export const AppProvider = ({
   ) => {
     const rootData = Object.assign(root);
 
+    const generatedPayload =
+      payload.hasOwnProperty("meta") && payload.meta.hasOwnProperty("attr")
+        ? payload.meta.attr
+        : payload;
+
     const queryable = method === "GET" ? "query" : "mutation";
 
-    if (payload["attr"] === "reference" || "object") {
-      const fullData = getRequestData(data, payload, false);
+    // const fullData = getRequestData(data, generatedPayload, false);
 
-      const mappedData = mapData(fullData);
+    // const mappedData = mapData(fullData);
 
-      console.log(mappedData, "mappedData");
+    // console.log(mappedData, "mappedData");
 
-      const compactData = getRequestData(data, payload, true);
+    const compactData = getRequestData(data, generatedPayload, true);
 
-      rootData[queryable] = {
-        ...rootData[queryable],
-        [metaQuery]: compactData
-      };
-    } else {
-      rootData[queryable] = {
-        ...rootData[queryable],
-        [metaQuery]: data
-      };
-    }
+    console.log(compactData, "compactData");
+
+    rootData[queryable] = {
+      ...rootData[queryable],
+      [metaQuery]: compactData
+    };
 
     setRoot(rootData);
   };
