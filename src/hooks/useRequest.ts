@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
 import { PayloadType } from "./payload";
-import { looper } from "./looper";
 
 type methodType = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -58,6 +57,6 @@ export function useRequest({
     fetchData,
     loading,
     errors,
-    results: looper(results, appContext)
+    results
   };
 }
