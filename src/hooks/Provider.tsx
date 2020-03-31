@@ -171,6 +171,8 @@ export const AppProvider = ({
     };
 
     setRoot(rootData);
+
+    localStorage.setItem("root", JSON.stringify(rootData));
   };
 
   const writeData = (rootData: any, data: any, payload: any) => {};
