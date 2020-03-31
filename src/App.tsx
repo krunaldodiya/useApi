@@ -1,42 +1,32 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useRequest } from "./hooks/useRequest";
-import { attr } from "./payload";
+import { attr, ref } from "./hooks/payload";
+import { AppContext } from "./hooks/Provider";
 
 function App() {
+  const appContext: any = useContext(AppContext);
+
   const { fetchData: fetchPosts, results: posts } = useRequest({
+    appContext,
     url: "https://jsonplaceholder.typicode.com/posts",
     payload: attr("array", attr("reference", { type: "many", ref: "posts" }))
   });
 
-  const { fetchData: fetchPostById, results: post } = useRequest({
+  const { fetchData: fetchPostById, results: postmain } = useRequest({
+    appContext,
     url: "https://jsonplaceholder.typicode.com/posts/1",
     payload: attr("object", attr("reference", { type: "one", ref: "posts" }))
   });
 
-  const { fetchData: fetchTestUsers } = useRequest({
-    url: "https://learning.shendre.com/api/test/users",
-    payload: attr("object", {
-      users: attr("reference", { type: "many", ref: "users" })
-    })
-  });
+  const postmainref = ref(postmain, appContext);
 
-  const { fetchData: fetchTestAuth } = useRequest({
-    url: "https://learning.shendre.com/api/test/auth",
-    payload: attr("object", {
-      token: attr("string"),
-      user: attr("reference", { type: "one", ref: "users" })
-    })
-  });
+  console.log(postmainref);
 
   return (
     <div>
       <button onClick={fetchPosts}>fetch posts</button>
 
       <button onClick={fetchPostById}>fetch post by id</button>
-
-      <button onClick={fetchTestUsers}>fetch test users</button>
-
-      <button onClick={fetchTestAuth}>fetch test auth</button>
 
       <div>
         <div
@@ -46,7 +36,7 @@ function App() {
             border: "1px solid green"
           }}
         >
-          <div key={post?.id}>{post?.title}</div>
+          <div key={postmainref?.id}>{postmainref?.title}</div>
         </div>
 
         <div
@@ -57,7 +47,13 @@ function App() {
           }}
         >
           {posts?.map((post: any) => {
-            return <div key={post.id}>{post.title}</div>;
+            const postref = ref(post, appContext);
+
+            return (
+              <div key={post.id}>
+                <div key={post.id}>{postref.title}</div>
+              </div>
+            );
           })}
         </div>
       </div>

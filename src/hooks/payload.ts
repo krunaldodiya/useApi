@@ -30,3 +30,11 @@ export function attr(
 ): PayloadType {
   return { attr, meta };
 }
+
+export function ref(model: any, appContext: any): any {
+  if (model && model.hasOwnProperty("ref")) {
+    return appContext.root.data[model["ref"]][model["id"]];
+  }
+
+  return undefined;
+}

@@ -1,4 +1,4 @@
-import { ModelType, attr } from "./payload";
+import { ModelType, attr } from "./hooks/payload";
 
 export const models: ModelType = {
   users: {

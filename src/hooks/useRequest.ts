@@ -1,11 +1,11 @@
 import axios from "axios";
-import { useContext, useState } from "react";
-import { PayloadType } from "../payload";
-import { AppContext } from "../Provider";
+import { useState } from "react";
+import { PayloadType } from "./payload";
 
 type methodType = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 type metaType = {
+  appContext: any;
   url: string;
   method?: methodType;
   variables?: object;
@@ -14,14 +14,13 @@ type metaType = {
 };
 
 export function useRequest({
+  appContext,
   url,
   method = "GET",
   variables = {},
   headers,
   payload
 }: metaType) {
-  const appContext: any = useContext(AppContext);
-
   const meta: any = {
     url,
     method,
@@ -32,10 +31,19 @@ export function useRequest({
 
   const metaQuery = JSON.stringify({ url, method, variables });
 
+  const requestData = appContext.root[method === "GET" ? "query" : "mutation"];
+
+  const requestExist = requestData && requestData.hasOwnProperty(metaQuery);
+
   const [loading, setLoading] = useState(false);
+
   const [errors, setErrors] = useState({});
 
   async function fetchData() {
+    if (requestExist) {
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await axios(meta);
@@ -47,15 +55,12 @@ export function useRequest({
     }
   }
 
-  const requestData = appContext.root[method === "GET" ? "query" : "mutation"];
+  const results = requestExist ? requestData[metaQuery] : undefined;
 
   return {
     fetchData,
     loading,
     errors,
-    results:
-      requestData && requestData.hasOwnProperty(metaQuery)
-        ? requestData[metaQuery]
-        : undefined
+    results
   };
 }

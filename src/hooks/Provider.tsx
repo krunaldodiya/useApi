@@ -1,6 +1,6 @@
 import React, { createContext, useState } from "react";
 import { ModelType } from "./payload";
-import { createVerify } from "crypto";
+import deepmerge from "deepmerge";
 
 const persistedInitialData = localStorage.getItem("root");
 const initialContext = {
@@ -109,21 +109,31 @@ export const AppProvider = ({
   let map: any = {};
 
   const mapData: any = (data: any) => {
-    const keys = Object.keys(data);
-
     if (data.hasOwnProperty("ref")) {
-      const isObject = Object.keys(data).filter(
-        key => data[key] instanceof Object
-      );
+      const filteredData = Object.keys(data).reduce((carry, item) => {
+        if (data[item] instanceof Array || data[item] instanceof Object) {
+          return carry;
+        }
+        return { ...carry, [item]: data[item] };
+      }, {});
 
-      if (isObject.length === 0) {
-        map[data["ref"]] = { ...map[data["ref"]], [data["id"]]: data };
-      }
+      map[data["ref"]] = { ...map[data["ref"]] };
+
+      map[data["ref"]][data["id"]] = {
+        ...map[data["ref"]][data["id"]],
+        ...filteredData
+      };
     }
 
+    const keys = Object.keys(data);
+
     keys.forEach(key => {
-      if (data[key] instanceof Object || data[key] instanceof Array) {
+      if (data[key] instanceof Object) {
         mapData(data[key]);
+      }
+
+      if (data[key] instanceof Array) {
+        data[key].forEach((item: any) => mapData(item));
       }
     });
 
@@ -147,8 +157,10 @@ export const AppProvider = ({
 
     if (genPayload.attr === "reference" || genPayload.attr === "object") {
       const fullData = getRequestedData(data, genPayload, false);
-      const mappedData = mapData(fullData);
-      console.log(mappedData);
+
+      rootData["data"] = deepmerge(rootData.data, mapData(fullData));
+
+      setRoot(rootData);
     }
 
     const compactData = getRequestedData(data, genPayload, true);
