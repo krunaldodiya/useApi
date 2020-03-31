@@ -1,5 +1,6 @@
 import React, { createContext, useState } from "react";
 import { ModelType } from "./payload";
+import { createVerify } from "crypto";
 
 const persistedInitialData = localStorage.getItem("root");
 const initialContext = {
@@ -71,12 +72,11 @@ export const AppProvider = ({
     return data;
   };
 
-  const getRequestedData = (data: any, payload: any, compact: boolean) => {
-    const { attr, meta } =
-      payload.hasOwnProperty("meta") && payload.meta.hasOwnProperty("attr")
-        ? payload.meta
-        : payload;
-
+  const getRequestedData = (
+    data: any,
+    { attr, meta }: any,
+    compact: boolean
+  ) => {
     if (attr === "reference") {
       return generateRefObject(meta, data, compact);
     }
@@ -106,16 +106,28 @@ export const AppProvider = ({
     return data;
   };
 
-  const mapData: any = (data: any) => {
-    const process: any = (item: any) => {
-      return item;
-    };
+  let map: any = {};
 
-    if (data instanceof Array) {
-      return data.map(item => process(item));
-    } else {
-      return process(data);
+  const mapData: any = (data: any) => {
+    const keys = Object.keys(data);
+
+    if (data.hasOwnProperty("ref")) {
+      const isObject = Object.keys(data).filter(
+        key => data[key] instanceof Object
+      );
+
+      if (isObject.length === 0) {
+        map[data["ref"]] = { ...map[data["ref"]], [data["id"]]: data };
+      }
     }
+
+    keys.forEach(key => {
+      if (data[key] instanceof Object || data[key] instanceof Array) {
+        mapData(data[key]);
+      }
+    });
+
+    return map;
   };
 
   const writeRequest = (
@@ -128,13 +140,18 @@ export const AppProvider = ({
 
     const queryable = method === "GET" ? "query" : "mutation";
 
-    // const fullData = getRequestedData(data, payload, false);
+    const genPayload =
+      payload.hasOwnProperty("meta") && payload.meta.hasOwnProperty("attr")
+        ? payload.meta
+        : payload;
 
-    // const mappedData = mapData(fullData);
+    if (genPayload.attr === "reference" || genPayload.attr === "object") {
+      const fullData = getRequestedData(data, genPayload, false);
+      const mappedData = mapData(fullData);
+      console.log(mappedData);
+    }
 
-    // console.log(mappedData, "mappedData");
-
-    const compactData = getRequestedData(data, payload, true);
+    const compactData = getRequestedData(data, genPayload, true);
 
     rootData[queryable] = {
       ...rootData[queryable],
