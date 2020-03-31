@@ -71,7 +71,12 @@ export const AppProvider = ({
     return data;
   };
 
-  const getRequestData = (data: any, { attr, meta }: any, compact: boolean) => {
+  const getRequestedData = (data: any, payload: any, compact: boolean) => {
+    const { attr, meta } =
+      payload.hasOwnProperty("meta") && payload.meta.hasOwnProperty("attr")
+        ? payload.meta
+        : payload;
+
     if (attr === "reference") {
       return generateRefObject(meta, data, compact);
     }
@@ -121,22 +126,15 @@ export const AppProvider = ({
   ) => {
     const rootData = Object.assign(root);
 
-    const generatedPayload =
-      payload.hasOwnProperty("meta") && payload.meta.hasOwnProperty("attr")
-        ? payload.meta.attr
-        : payload;
-
     const queryable = method === "GET" ? "query" : "mutation";
 
-    // const fullData = getRequestData(data, generatedPayload, false);
+    // const fullData = getRequestedData(data, payload, false);
 
     // const mappedData = mapData(fullData);
 
     // console.log(mappedData, "mappedData");
 
-    const compactData = getRequestData(data, generatedPayload, true);
-
-    console.log(compactData, "compactData");
+    const compactData = getRequestedData(data, payload, true);
 
     rootData[queryable] = {
       ...rootData[queryable],
