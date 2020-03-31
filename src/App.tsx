@@ -15,14 +15,14 @@ function App() {
 
   const { fetchData: fetchTestUsers } = useRequest({
     url: "https://learning.shendre.com/api/test/users",
-    payload: attr("custom", {
+    payload: attr("object", {
       users: attr("reference", { type: "many", ref: "users" })
     })
   });
 
   const { fetchData: fetchTestAuth } = useRequest({
     url: "https://learning.shendre.com/api/test/auth",
-    payload: attr("custom", {
+    payload: attr("object", {
       token: attr("string"),
       user: attr("reference", { type: "one", ref: "users" })
     })
