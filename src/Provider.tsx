@@ -23,21 +23,28 @@ export const AppProvider = ({
 }) => {
   const [root, setRoot] = useState(initialData);
 
-  const generateObject = (ref: any, result: any) => {
-    const obj = models[ref];
+  const generateObject: any = (ref: any, result: any) => {
+    const obj: any = models[ref];
+
     const keys = Object.keys(obj);
 
     return keys.reduce(
       (carry, item) => {
         if (!result.hasOwnProperty(item)) return carry;
 
-        return { ...carry, [item]: result[item] };
+        return {
+          ...carry,
+          [item]:
+            obj[item]["attr"] === "reference"
+              ? generateRefObject(obj[item]["meta"], result[item])
+              : result[item]
+        };
       },
       { ref }
     );
   };
 
-  const generateRefObject = (meta: any, data: any) => {
+  const generateRefObject: any = (meta: any, data: any) => {
     const ref = meta["ref"];
 
     if (meta["type"] === "one") {
@@ -53,8 +60,6 @@ export const AppProvider = ({
     return data;
   };
 
-  // payload > attr, meta > ref
-
   const getRequestData = (data: any, { attr, meta }: any) => {
     if (attr === "reference") {
       return generateRefObject(meta, data);
@@ -67,18 +72,13 @@ export const AppProvider = ({
         const payload = meta[item];
 
         if (payload["attr"] === "reference") {
-          const object = generateRefObject(
-            payload["meta"],
-            data[payload["meta"]["ref"]]
-          );
+          const object = generateRefObject(payload["meta"], data[item]);
 
           return { ...carry, [item]: object };
         }
 
-        return { ...carry, [item]: payload };
+        return { ...carry, [item]: data[item] };
       }, {});
-
-      console.log(tk, "hello");
 
       return tk;
     }
@@ -98,7 +98,7 @@ export const AppProvider = ({
 
     const requestData = getRequestData(data, payload);
 
-    // console.log(requestData, "requestData");
+    console.log(requestData, "requestData");
 
     rootData[queryable] = { ...rootData[queryable], [metaQuery]: requestData };
 
