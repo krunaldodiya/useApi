@@ -1,3 +1,5 @@
+// https://playcode.io/534074
+
 export type ReferenceObjectType = { type: "one" | "many"; ref: string };
 
 export type ObjectType = { [key: string]: any };
