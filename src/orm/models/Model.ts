@@ -3,11 +3,6 @@ export default class Model {
   getData: any;
   setData: any;
   getCollection: any;
-  initialContext: any;
-
-  constructor(initialContext: any) {
-    this.initialContext = initialContext;
-  }
 
   get collection() {
     const data = this.getData();
@@ -38,20 +33,18 @@ export default class Model {
   }
 
   create(obj: any) {
-    obj["id"] = obj.hasOwnProperty("id")
-      ? obj.hasOwnProperty("id")
-      : this.collection.length + 1;
+    obj["id"] =
+      obj.hasOwnProperty("id") && obj.id !== null
+        ? obj["id"]
+        : this.collection.length + 1;
 
     this.setData({ [this.table]: [...this.collection, obj] });
   }
 
-  update(id: any) {
+  update(id: any, newObj: any) {
     const items = this.collection.map((item: any) => {
       if (item.id === id) {
-        return {
-          ...item,
-          name: "updated"
-        };
+        return { ...item, ...newObj };
       }
 
       return item;

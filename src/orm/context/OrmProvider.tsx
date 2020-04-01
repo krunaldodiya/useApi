@@ -28,10 +28,7 @@ export const OrmProvider = ({
 
       if (!context.data.hasOwnProperty(instance.table)) {
         Object.defineProperty(initialContext.data, instance.table, {
-          value: [],
-          writable: true,
-          configurable: true,
-          enumerable: true
+          value: []
         });
       }
 
@@ -39,10 +36,7 @@ export const OrmProvider = ({
       instance.setData = setData;
 
       Object.defineProperty(initialContext, model.name, {
-        value: instance,
-        writable: true,
-        configurable: true,
-        enumerable: true
+        value: instance
       });
     });
   }, [models, context]);

@@ -1,46 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useORM from "./orm/hooks/useORM";
+const initialUser = { id: null, name: "" };
 
 function App() {
-  const { context } = useORM();
-  const { User } = context;
+  const [selectedUser, setSelectedUser] = useState(initialUser);
 
-  const [name, setName] = useState("");
-  const users = User.all();
+  const { User } = useORM();
 
-  const addUser = (e: any) => {
-    e.preventDefault();
+  const getUsers = User.all();
 
-    User.create({
-      name
-    });
-
-    setName("");
-  };
-
-  const deleteUser = (id: any) => {
-    User.delete(id);
-  };
+  useEffect(() => {});
 
   return (
     <div>
-      <div>
-        <form onSubmit={addUser}>
-          <input
-            type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
-          />
-          <button type="submit">add</button>
-        </form>
-      </div>
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+
+          if (selectedUser.id) {
+            User.update(selectedUser.id, selectedUser);
+          } else {
+            User.create(selectedUser);
+          }
+
+          setSelectedUser(initialUser);
+        }}
+      >
+        <input
+          type="text"
+          value={selectedUser.name}
+          onChange={e => {
+            setSelectedUser({ ...selectedUser, name: e.target.value });
+          }}
+        />
+        <button>{selectedUser.id ? "update" : "add"} </button>
+      </form>
 
       <div>
-        {users.map((user: any) => {
+        {getUsers.map((user: any) => {
           return (
-            <div key={user.id}>
-              <div onClick={() => deleteUser(user.id)}>
-                {user.id}, {user.name}
+            <div
+              key={user.id}
+              style={{ display: "flex", flexDirection: "row" }}
+            >
+              <div style={{ margin: 10 }}>
+                {user.id} {user.name}
+              </div>
+
+              <div
+                style={{ margin: 10 }}
+                onClick={() => {
+                  setSelectedUser(user);
+                }}
+              >
+                edit
+              </div>
+
+              <div
+                style={{ margin: 10 }}
+                onClick={() => {
+                  User.delete(user.id);
+                }}
+              >
+                delete
               </div>
             </div>
           );
