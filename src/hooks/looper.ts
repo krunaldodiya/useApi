@@ -1,26 +1,41 @@
-export const looper: any = (loopdata: any, appContext: any) => {
-  let loop: any;
+const datamapper = (data: any, dataprop: any) => {
+  return data[dataprop["ref"]][dataprop["id"]];
+};
 
-  const mapper: any = (mapdata: any) => {
-    if (mapdata.hasOwnProperty("ref")) {
-      const model = appContext.root.data[mapdata["ref"]][mapdata["id"]];
-      console.log(model);
+const reducer = (reducerdata: any, mapperdata: any) => {
+  let obj: any = {};
+
+  Object.keys(reducerdata).forEach(key => {
+    if (mapperdata[key] instanceof Array) {
+      const mappedData = mapperdata[key].map((item: any) => {
+        const metadata = mapper(item);
+
+        return metadata.hasOwnProperty("ref")
+          ? { ...metadata, ...datamapper({}, metadata) }
+          : metadata;
+      });
+      obj[key] = mappedData;
+    } else if (mapperdata[key] instanceof Object) {
+      const mappedData = mapper(mapperdata[key]);
+      obj[key] = mappedData.hasOwnProperty("ref")
+        ? { ...mappedData, ...datamapper({}, mappedData) }
+        : mappedData;
+    } else {
+      obj[key] = mapperdata[key];
     }
+  });
 
-    const keys = Object.keys(mapdata);
+  return obj;
+};
 
-    keys.forEach(key => {
-      if (mapdata[key] instanceof Object) {
-        mapper(mapdata[key]);
-      }
+export const mapper = (mapperdata: any) => {
+  if (mapperdata instanceof Array) {
+    return mapperdata.map(item => reducer(item, mapperdata));
+  }
 
-      if (mapdata[key] instanceof Array) {
-        mapdata[key].forEach((item: any) => mapper(item));
-      }
-    });
-  };
+  if (mapperdata instanceof Object) {
+    return reducer(mapperdata, mapperdata);
+  }
 
-  mapper(loopdata);
-
-  return loop;
+  return mapperdata;
 };
