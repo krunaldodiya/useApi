@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
 import { PayloadType } from "./payload";
-import { mapper } from "./looper";
 
 type methodType = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -52,9 +51,51 @@ export function useRequest({
     }
   }
 
+  const datamapper = (dataprop: any) => {
+    return appContext.root.data[dataprop["ref"]][dataprop["id"]];
+  };
+
+  const reducer = (reducerdata: any) => {
+    let obj: any = {};
+
+    Object.keys(reducerdata).forEach(key => {
+      if (reducerdata[key] instanceof Array) {
+        const mappedData = reducerdata[key].map((item: any) => {
+          const metadata = mapper(item);
+
+          return metadata.hasOwnProperty("ref")
+            ? { ...metadata, ...datamapper(metadata) }
+            : metadata;
+        });
+        obj[key] = mappedData;
+      } else if (reducerdata[key] instanceof Object) {
+        const mappedData = mapper(reducerdata[key]);
+        obj[key] = mappedData.hasOwnProperty("ref")
+          ? { ...mappedData, ...datamapper(mappedData) }
+          : mappedData;
+      } else {
+        obj[key] = reducerdata[key];
+      }
+    });
+
+    return obj;
+  };
+
+  const mapper = (mapperdata: any) => {
+    if (mapperdata instanceof Array) {
+      return mapperdata.map(item => reducer(item));
+    }
+
+    if (mapperdata instanceof Object) {
+      return reducer(mapperdata);
+    }
+
+    return mapperdata;
+  };
+
   const results = requestExist ? requestData[metaQuery] : undefined;
 
-  console.log(mapper(results, appContext.root.data));
+  console.log(mapper(results));
 
   return {
     fetchData,
