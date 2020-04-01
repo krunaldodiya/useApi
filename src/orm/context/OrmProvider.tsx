@@ -24,12 +24,14 @@ export const OrmProvider = ({
 
   useEffect(() => {
     models.forEach((model: any) => {
-      const instance = new model();
+      const instance = new model(initialContext);
 
       if (!context.data.hasOwnProperty(instance.table)) {
         Object.defineProperty(initialContext.data, instance.table, {
           value: [],
-          writable: true
+          writable: true,
+          configurable: true,
+          enumerable: true
         });
       }
 
@@ -38,12 +40,16 @@ export const OrmProvider = ({
 
       Object.defineProperty(initialContext, model.name, {
         value: instance,
-        writable: true
+        writable: true,
+        configurable: true,
+        enumerable: true
       });
     });
   }, [models, context]);
 
   return (
-    <OrmContext.Provider value={{ context }}>{children}</OrmContext.Provider>
+    <OrmContext.Provider value={{ context, setContext }}>
+      {children}
+    </OrmContext.Provider>
   );
 };

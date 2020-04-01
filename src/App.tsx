@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import useORM from "./orm/hooks/useORM";
 
 function App() {
-  const { User } = useORM();
+  const { context } = useORM();
+  const { User } = context;
 
   const [name, setName] = useState("");
-
   const users = User.all();
 
-  function addUser(e: any) {
+  const addUser = (e: any) => {
     e.preventDefault();
 
     User.create({
@@ -16,11 +16,11 @@ function App() {
     });
 
     setName("");
-  }
+  };
 
-  function deleteUser(id: any) {
+  const deleteUser = (id: any) => {
     User.delete(id);
-  }
+  };
 
   return (
     <div>

@@ -3,19 +3,19 @@ export default class Model {
   getData: any;
   setData: any;
   getCollection: any;
+  initialContext: any;
 
-  get data() {
-    return this.getData();
+  constructor(initialContext: any) {
+    this.initialContext = initialContext;
   }
 
   get collection() {
     const data = this.getData();
+
     return data[this.table];
   }
 
   all() {
-    console.log(this.collection, "collection");
-
     return this.collection;
   }
 
@@ -43,6 +43,21 @@ export default class Model {
       : this.collection.length + 1;
 
     this.setData({ [this.table]: [...this.collection, obj] });
+  }
+
+  update(id: any) {
+    const items = this.collection.map((item: any) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          name: "updated"
+        };
+      }
+
+      return item;
+    });
+
+    this.setData({ [this.table]: items });
   }
 
   delete(id: any) {
