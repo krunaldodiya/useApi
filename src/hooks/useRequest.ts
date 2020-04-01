@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { PayloadType } from "./payload";
+import { mapper } from "./looper";
 
 type methodType = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -52,6 +53,8 @@ export function useRequest({
   }
 
   const results = requestExist ? requestData[metaQuery] : undefined;
+
+  console.log(mapper(results, appContext.root.data));
 
   return {
     fetchData,
