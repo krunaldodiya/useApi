@@ -1,61 +1,23 @@
-export default class Model {
-  table: any;
-  getData: any;
-  setData: any;
-  getCollection: any;
+import { Database } from "../Database";
 
-  get collection() {
-    const data = this.getData();
-
-    return data[this.table];
-  }
+export default class Model extends Database {
+  store: any;
 
   all() {
-    return this.collection;
+    return this.store.context;
   }
 
-  find(id?: any) {
-    if (id) {
-      const findById = this.collection.find((item: any) => item.id === id);
+  delete() {
+    delete this.store.context["name"];
 
-      return findById ?? null;
-    }
-
-    return this.first();
+    return this.store.setContext({});
   }
 
-  first() {
-    return this.collection[0] ?? null;
+  add() {
+    return this.store.setContext({ name: "john" });
   }
 
-  last() {
-    return this.collection.shift();
-  }
-
-  create(obj: any) {
-    obj["id"] =
-      obj.hasOwnProperty("id") && obj.id !== null
-        ? obj["id"]
-        : this.collection.length + 1;
-
-    this.setData({ [this.table]: [...this.collection, obj] });
-  }
-
-  update(id: any, newObj: any) {
-    const items = this.collection.map((item: any) => {
-      if (item.id === id) {
-        return { ...item, ...newObj };
-      }
-
-      return item;
-    });
-
-    this.setData({ [this.table]: items });
-  }
-
-  delete(id: any) {
-    const items = this.collection.filter((item: any) => item.id !== id);
-
-    this.setData({ [this.table]: items });
+  change() {
+    return this.store.setContext({ name: "max" });
   }
 }

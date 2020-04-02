@@ -1,73 +1,25 @@
-import React, { useState, useEffect } from "react";
-import useORM from "./orm/hooks/useORM";
-const initialUser = { id: null, name: "" };
+import React, { useContext } from "react";
+import { OrmContext } from "./orm/context/OrmProvider";
+import { Test } from "./models/Test";
 
 function App() {
-  const [selectedUser, setSelectedUser] = useState(initialUser);
+  const data: any = useContext(OrmContext);
 
-  const { User } = useORM();
+  const tm = new Test();
 
-  const getUsers = User.all();
+  console.log(tm, "tm");
 
-  useEffect(() => {});
+  Object.defineProperty(tm, "store", { value: data });
+
+  const meta = tm.all();
 
   return (
     <div>
-      <form
-        onSubmit={e => {
-          e.preventDefault();
+      <button onClick={() => tm.add()}>add</button>
+      <button onClick={() => tm.change()}>change</button>
+      <button onClick={() => tm.delete()}>remove</button>
 
-          if (selectedUser.id) {
-            User.update(selectedUser.id, selectedUser);
-          } else {
-            User.create(selectedUser);
-          }
-
-          setSelectedUser(initialUser);
-        }}
-      >
-        <input
-          type="text"
-          value={selectedUser.name}
-          onChange={e => {
-            setSelectedUser({ ...selectedUser, name: e.target.value });
-          }}
-        />
-        <button>{selectedUser.id ? "update" : "add"} </button>
-      </form>
-
-      <div>
-        {getUsers.map((user: any) => {
-          return (
-            <div
-              key={user.id}
-              style={{ display: "flex", flexDirection: "row" }}
-            >
-              <div style={{ margin: 10 }}>
-                {user.id} {user.name}
-              </div>
-
-              <div
-                style={{ margin: 10 }}
-                onClick={() => {
-                  setSelectedUser(user);
-                }}
-              >
-                edit
-              </div>
-
-              <div
-                style={{ margin: 10 }}
-                onClick={() => {
-                  User.delete(user.id);
-                }}
-              >
-                delete
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <pre>{JSON.stringify(meta)}</pre>
     </div>
   );
 }

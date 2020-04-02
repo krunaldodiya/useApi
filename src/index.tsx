@@ -1,13 +1,19 @@
-import React, { lazy, Suspense } from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
+import App from "./App";
+import { Test } from "./models/Test";
 import { OrmProvider } from "./orm/context/OrmProvider";
-import { models } from "./models";
+import { Database } from "./orm/Database";
 
-const App = lazy(() => import("./App"));
+const database = new Database();
+
+database.register(Test);
+
+console.log(database);
 
 ReactDOM.render(
   <React.StrictMode>
-    <OrmProvider models={models}>
+    <OrmProvider database={database}>
       <Suspense fallback={null}>
         <App />
       </Suspense>
