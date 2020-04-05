@@ -1,25 +1,42 @@
-import React, { useContext } from "react";
-import { OrmContext } from "./orm/context/OrmProvider";
-import { Test } from "./models/Test";
+import React, { useState } from "react";
+import User from "./models/User";
 
 function App() {
-  const data: any = useContext(OrmContext);
+  const [users, setUsers] = useState([]);
 
-  const tm = new Test();
+  const usersub = User.get();
 
-  console.log(tm, "tm");
+  usersub.subscribe((users: any) => {
+    setUsers(users);
+  });
 
-  Object.defineProperty(tm, "store", { value: data });
-
-  const meta = tm.all();
+  console.log(users, "users");
 
   return (
     <div>
-      <button onClick={() => tm.add()}>add</button>
-      <button onClick={() => tm.change()}>change</button>
-      <button onClick={() => tm.delete()}>remove</button>
+      <button
+        onClick={() => {
+          try {
+            User.create({ name: "krunal" });
+          } catch (error) {
+            console.log(error);
+          }
+        }}
+      >
+        add
+      </button>
 
-      <pre>{JSON.stringify(meta)}</pre>
+      <div>{JSON.stringify(users)}</div>
+
+      <div>
+        {users.map((user: any) => {
+          return (
+            <div key={user.id}>
+              <div>{user.name}</div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
